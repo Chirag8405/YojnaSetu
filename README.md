@@ -35,6 +35,20 @@ docker-compose up --build
 curl -s http://localhost:8000/health
 ```
 
+## Local Dev (Single Command)
+
+Start both backend and frontend from the repository root:
+
+```bash
+npm run dev
+```
+
+This command will:
+- create `.env` from `.env.example` if missing,
+- set up `backend/.venv311` with Python 3.11 using `uv` (first run only),
+- start backend on `http://localhost:8000`,
+- start frontend on `http://localhost:3000`.
+
 ## Data Loading
 
 ```bash
