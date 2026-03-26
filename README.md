@@ -43,6 +43,12 @@ Start both backend and frontend from the repository root:
 npm run dev
 ```
 
+If ports `8000` or `3000` are stuck from a previous run, use a clean start:
+
+```bash
+npm run dev:clean
+```
+
 This command will:
 - create `.env` from `.env.example` if missing,
 - set up `backend/.venv311` with Python 3.11 using `uv` (first run only),

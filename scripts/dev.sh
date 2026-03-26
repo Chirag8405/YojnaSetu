@@ -6,10 +6,31 @@ BACKEND_DIR="$ROOT_DIR/backend"
 FRONTEND_DIR="$ROOT_DIR/frontend"
 BACKEND_PID=""
 FRONTEND_PID=""
+CLEAN_START=false
+
+if [[ "${1:-}" == "--clean" ]]; then
+  CLEAN_START=true
+fi
 
 port_in_use() {
   local port="$1"
   ss -ltn 2>/dev/null | grep -qE "[\.:]${port}[[:space:]]"
+}
+
+kill_port() {
+  local port="$1"
+  if command -v fuser >/dev/null 2>&1; then
+    fuser -k "${port}/tcp" >/dev/null 2>&1 || true
+    return
+  fi
+
+  if command -v lsof >/dev/null 2>&1; then
+    local pids
+    pids="$(lsof -ti tcp:"$port" || true)"
+    if [[ -n "$pids" ]]; then
+      kill $pids >/dev/null 2>&1 || true
+    fi
+  fi
 }
 
 cleanup() {
@@ -41,6 +62,13 @@ if [[ ! -x "$BACKEND_DIR/.venv311/bin/python" ]]; then
     uv venv --python 3.11 .venv311
     uv pip install --python .venv311/bin/python -r requirements.txt
   )
+fi
+
+if [[ "$CLEAN_START" == true ]]; then
+  echo "Clean start requested; stopping any process on ports 8000 and 3000..."
+  kill_port 8000
+  kill_port 3000
+  sleep 1
 fi
 
 if port_in_use 8000; then
